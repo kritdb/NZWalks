@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NZWalksAPI.Repositories;
 
@@ -18,6 +19,7 @@ namespace NZWalksAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "reader")]
         public async Task<IActionResult> GetAllWalkDifficulties()
         {
             var walkDifficulty = await walkDifficultyRepository.GetAllAsync();
@@ -30,11 +32,12 @@ namespace NZWalksAPI.Controllers
 
         [HttpGet]
         [Route("{id:guid}")]
+        [Authorize(Roles = "reader")]
         public async Task<IActionResult> GetWalkDifficultyById(Guid id)
         {
             var walkDifficulty = await walkDifficultyRepository.GetAsync(id);
 
-            if(walkDifficulty == null)
+            if (walkDifficulty == null)
             {
                 return NotFound("Walk Difficulty not found");
             }
@@ -46,12 +49,13 @@ namespace NZWalksAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> AddWalkDifficultyAsync([FromBody] Models.DTO.AddWalkDifficultyRequest addWalkDifficultyRequest)
         {
             // Convert DTO to Domain object
             var walkDomainDiff = new Models.Domain.WalkDifficulty
             {
-               Code=addWalkDifficultyRequest.Code
+                Code = addWalkDifficultyRequest.Code
             };
 
             // Pass domain object to Repository to persist this
@@ -71,6 +75,7 @@ namespace NZWalksAPI.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> UpdateWalkDifficultyAsync([FromRoute] Guid id,
             [FromBody] Models.DTO.UpdateWalkDifficultyRequest updateWalkDifficultyRequest)
         {
@@ -78,7 +83,7 @@ namespace NZWalksAPI.Controllers
             var walkDiffDomain = new Models.Domain.WalkDifficulty
             {
                 Code = updateWalkDifficultyRequest.Code
-                
+
             };
 
             // Pass details to Repository - Get domain object in response ( or null)
@@ -103,6 +108,7 @@ namespace NZWalksAPI.Controllers
 
         [HttpDelete]
         [Route("{id:guid}")]
+        [Authorize(Roles = "writer")]
         public async Task<IActionResult> DeleteWalkAsync(Guid id)
         {
             // Call Repository to delete walk
